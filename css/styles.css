@@ -1,0 +1,73 @@
+.ticTacToBoard{
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: 300px 300px 300px;
+  grid-template-rows: 300px 300px 300px;
+  margin-left: 10px;
+  margin-top: 10px;
+   /* grid-gap: 5px; */
+}
+
+.box1 {
+  background-color: grey;
+  grid-column-start: 1;
+  grid-row-start: 1;
+}
+
+.box2 {
+  background-color: grey;
+  grid-column-start: 1;
+  grid-row-start: 2;
+}
+
+.box3 {
+  background-color: grey;
+  grid-column-start: 1;
+  grid-row-start: 3;
+}
+
+.box4 {
+  background-color: grey;
+  grid-column-start: 2;
+  grid-row-start: 1;
+}
+
+.box5 {
+  background-color: grey;
+  grid-column-start: 2;
+  grid-row-start: 2;
+}
+
+.box6 {
+  background-color: grey;
+  grid-column-start: 2;
+  grid-row-start: 3;
+}
+
+.box7 {
+  background-color: grey;
+  grid-column-start: 3;
+  grid-row-start: 1;
+}
+
+.box8 {
+  background-color: grey;
+  grid-column-start: 3;
+  grid-row-start: 2;
+}
+
+.box9 {
+  background-color: grey;
+  grid-column-start: 3;
+  grid-row-start: 3;
+}
+
+.xPic{
+  background-color: red;
+}
+.oPic{
+  background-color: green;
+}
+
+/* js: %, separate $ in grid template */
+/* refactor grid to auto*/
