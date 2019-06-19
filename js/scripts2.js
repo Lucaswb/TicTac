@@ -4,12 +4,12 @@ var leftOffSet = 10;
 var gridGap = 10;
 var turnCounter;
 var gameBoard;
-var menuShowing = false;
+var menuShowing = true;
 var opponentType;
 //ONLOAD
 
 gameBoard = new Board();
-
+gameBoard.activation = false;
 function clicked(event){
   // console.log(gameBoard.boardArray.toString()
 
@@ -40,22 +40,23 @@ function clicked(event){
           var winner = checkIfWinner(gameBoard.boardArray);
           if (winner){
             console.log(winner);
+            $(".win").text("PLAYER [" + ((gameBoard.turnCounter % 2) + 1) + "]WAS THE WINNER!");
             gameBoard.activation = false
           }
           var draw = checkDraw(gameBoard.boardArray);
           if (draw){
             console.log("it was a draw")
+            $(".win").text("IT WAS A DRAW!");
             gameBoard.activation = false
           }
         }
       }
 
       //AI MOVE
-      if(gameBoard.opponentType === "ai" && counter % 2 != 0){
+      if(gameBoard.activation && gameBoard.opponentType === "ai" && gameBoard.turnCounter % 2 != 0){
          setTimeout(function(){
            aiMove(gameBoard);
          }, 1000);
-
       }
     };
   }
@@ -110,7 +111,9 @@ function boardViewReset(){
 
 function resetBoard(){
   gameBoard.boardReset();
+  gameBoard.turnCounter = 0;
   boardViewReset();
+  $(".win").text("");
 }
 
 //TAKES IN GLOBAL VARIABLES
@@ -164,12 +167,16 @@ function checkIfWinner(boardInput){
 }
 
 $(document).ready(function(){
-  $("#resetButton").submit(function(){
+  // alert("hi")
+  $("#resetButton").click(function(event){
+    event.preventDefault();
     resetBoard();
+    gameBoard.activation = true;
   });
 
   //menu toggle
-  $("#menuButton").click(function(){
+  $("#menuButton").click(function(event){
+    event.preventDefault();
     console.log("this function ran")
     if (menuShowing){
       console.log(menuShowing)
@@ -204,13 +211,42 @@ $(document).ready(function(){
   });
 });
 
-aiMove(){
+function aiMove(boardInput){
+  var ran = Math.floor((Math.random()*9)+1);
+  if (!boardInput.boardArray[ran]){
+    boardInput.boardArray[ran]=-1;
+    $(".box" + ran).addClass("oPic");
+    boardInput.turnCounter++;
 
+    //CHECK GAME OVER
+    var winner = checkIfWinner(gameBoard.boardArray);
+    if (winner){
+      console.log(winner);
+      gameBoard.activation = false
+      $(".win").text("YOU GOT BEAT BY THE AI!");
+    }
+    var draw = checkDraw(gameBoard.boardArray);
+    if (draw){
+      console.log("it was a draw")
+      gameBoard.activation = false
+
+    }
+  } else {
+    aiMove(boardInput);
+  }
+  // $(".box" + square).addClass("xPic");
+  // gameBoard.boardArray[airmove] = 1;
+
+  // $(".box" + square).addClass("oPic");
+  // gameBoard.boardArray[aimove] = -1;
 }
+
+//FINAL WINNING MOVE AGAINST AI ENDED IN DRAW
 //offset counter by 1 for ai going first
 //change dropdown text to option selected
 //fadIn and slideUP are not working properly for menuform
 //card colors sections
 //opponent type is global
+//change global variables from aiMove
 
 //can seem like its working if its deleting stuff but maybe is reloading page because not prevent default

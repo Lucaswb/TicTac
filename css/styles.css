@@ -87,14 +87,18 @@ body {
    margin-top: 100px;
    width: 70%;
    height: 300px;
-   display: none;
+   /* display: none; */
 }
 
 select.form-control{
   display: none;
 }
 
-
+.win{
+  font-size: 30px;
+  color: white;
+  font-style: italic;
+}
 
 
 /*TO DO LIST */
