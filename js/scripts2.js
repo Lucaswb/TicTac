@@ -2,15 +2,16 @@ var squareSize = 300 //line this up with grid dimensions
 var topOffSet = 10;
 var leftOffSet = 10;
 var gridGap = 10;
-var turnCounter;
 var gameBoard;
 var menuShowing = true;
 var opponentType;
 //ONLOAD
-
+var array1exception = [0,0,0,1,0,-1,0,1,0,0];
+var array2exception = [0,1,0,1,0,-1,0,0,0,1];
 gameBoard = new Board();
 gameBoard.activation = false;
 function clicked(event){
+  console.log("turn coutner" + gameBoard.turnCounter)
   // console.log(gameBoard.boardArray.toString()
   if (gameBoard.activation === false) {
     console.log("the game is not running")
@@ -32,19 +33,20 @@ function clicked(event){
           if (gameBoard.turnCounter % 2 === 0){
             $(".box" + square).addClass("xPic");
             gameBoard.boardArray[square] = 1;
+            gameBoard.turnCounter++;
           } else { // turnCounter is not % 2 === 0
             $(".box" + square).addClass("oPic");
             gameBoard.boardArray[square] = -1;
+            gameBoard.turnCounter++;
           }
-          gameBoard.turnCounter++;
+
           var winner = checkIfWinner(gameBoard.boardArray);
+          var draw = checkDraw(gameBoard.boardArray);
           if (winner){
             console.log(winner);
             $(".win").text("PLAYER " + (((gameBoard.turnCounter +1) % 2)+1) + " WAS THE WINNER!");
             gameBoard.activation = false
-          }
-          var draw = checkDraw(gameBoard.boardArray);
-          if (draw){
+          } else if (draw){
             console.log("it was a draw")
             $(".win").text("IT WAS A DRAW!");
             gameBoard.activation = false
@@ -53,10 +55,19 @@ function clicked(event){
       }
       //AI MOVE
       if(gameBoard.activation && gameBoard.opponentType === "ai" && gameBoard.turnCounter % 2 != gameBoard.turn){
-         setTimeout(function(){
-           // aiMoveRandom(gameBoard);
-           aiMoveHard(gameBoard);
-         }, 1000);
+        setTimeout(function(){
+          // aiMoveRandom(gameBoard);
+          if (gameBoard.difficulty === "1"){
+            aiMoveRandom(gameBoard);
+          }
+          else if (gameBoard.difficulty === "2"){
+            aiMoveHard(gameBoard);
+
+          } else {
+            aiImpossible(gameBoard);
+            console.log("turn coutner" + gameBoard.turnCounter)
+          }
+        }, 1000);
       }
     };
   }
@@ -64,7 +75,7 @@ function clicked(event){
 
 function Board(opponentType, difficulty, turn){
   if (opponentType === "ai" && turn === 1){
-      this.turn = 1;
+    this.turn = 1;
   } else {
     this.turn = 0;
   }
@@ -99,6 +110,105 @@ function getSquare(x, y){
   }
   return false;
 }
+function aiImpossible(boardInput){
+  if (boardInput.turn===1){
+    if (boardInput.turnCounter===0){
+      if (gameBoard.turn===0) {
+        boardInput.boardArray[3]=-1;
+        $(".box" + 3).addClass("oPic");
+        boardInput.turnCounter++;
+      } else {
+        boardInput.boardArray[3]=1;
+        $(".box" + 3).addClass("xPic");
+        boardInput.turnCounter++;
+      }
+    } else if (boardInput.turnCounter === 2){
+      var playerMove = findPlayerFirstMove(boardInput);
+      var aiMove;
+      switch (playerMove) {
+        case 1:
+        aiMove=7
+        break;
+        case 2:
+        aiMove= 5;
+        break;
+        case 4:
+        aiMove= 5;
+        break;
+        case 5:
+        aiMove= 7;
+        break;
+        case 6:
+        aiMove= 5;
+        break;
+        case 7:
+        aiMove= 9;
+        break;
+        case 8:
+        aiMove= 5;
+        break;
+        case 9:
+        aiMove= 7;
+        break;
+        default:
+      }
+      if (gameBoard.turn===0) {
+        boardInput.boardArray[aiMove]=-1;
+        $(".box" + aiMove).addClass("oPic");
+        boardInput.turnCounter++;
+      } else {
+        boardInput.boardArray[aiMove]=1;
+        $(".box" + aiMove).addClass("xPic");
+        boardInput.turnCounter++;
+      }
+    } else {
+      aiMoveHard(boardInput);
+    }
+  } else {
+    // debugger;
+    var playerMove = findPlayerFirstMove(boardInput);
+    var aiMove;
+    if(boardInput.boardArray.toString() === array1exception.toString() || boardInput.boardArray.toString() === array2exception.toString()){
+      if (gameBoard.turn===0) {
+        boardInput.boardArray[4]=-1;
+        $(".box" + 4).addClass("oPic");
+        boardInput.turnCounter++;
+      } else {
+        boardInput.boardArray[4]=1;
+        $(".box" + 4).addClass("xPic");
+        boardInput.turnCounter++;
+      }
+    } else if(playerMove != 5 && boardInput.turnCounter === 1){
+      if (gameBoard.turn===0) {
+        boardInput.boardArray[5]=-1;
+        $(".box" + 5).addClass("oPic");
+        boardInput.turnCounter++;
+      } else {
+        boardInput.boardArray[5]=1;
+        $(".box" + 5).addClass("xPic");
+        boardInput.turnCounter++;
+      }
+    } else {
+      aiMoveHard(boardInput);
+    }
+  }
+}
+
+//takes in board, returns which board square was set to 1 by player
+function findPlayerFirstMove(boardInput){
+  for (var i = 0; i <= 9; i++){
+    if (boardInput.turn === 0){
+      if (boardInput.boardArray[i] === 1){
+        return i;
+      }
+    } else {
+      if (boardInput.boardArray[i] === -1){
+        return i;
+      }
+    }
+  }
+}
+
 
 function makeBoard(){
   var newBoard = []
@@ -172,11 +282,46 @@ function checkIfWinner(boardInput){
   }
 }
 
+function checkIfAdvantage(boardInput, turn){
+  for (var i=0; i<=6; i+=3){
+    var win1 = boardInput[i+1]+boardInput[i+2]+boardInput[i+3]
+    if (win1 === 2){
+      return 1;
+    } else if (win1 === -2) {
+      return 2;
+    } else {
+    }
+  }
+  for (var i=1; i<=3; i+=1){
+    var win2 = boardInput[i]+boardInput[i+3]+boardInput[i+6];
+    if (win2 === 2){
+      return 1;
+    } else if (win2 === -2) {
+      return 2;
+    } else {
+    }
+  }
+  var win3 = boardInput[1]+boardInput[5]+boardInput[9];
+  if (win3 === 2){
+    return 1;
+  } else if (win3 === -2) {
+    return 2;
+  } else {
+  }
+
+  var win4 = boardInput[3]+boardInput[5]+boardInput[7];
+  if (win4 === 2){
+    return 1;
+  } else if (win4 === -2) {
+    return 2;
+  } else {
+  }
+}
 // Attempt to create a hard AI
 // testBoard = new Board("ai","2","1");
 // var testBoard1 = [0,1,1,0,-1,-1,0,1,-1]
 //
-// function AiHard(boardInput, turnCounter, turn) {
+// function aiMoveHard(boardInput, turnCounter, turn) {
 //   var sums = [0];
 //   var num = 1;
 //   for (var i = 1, i <= 3, i+=1);
@@ -199,7 +344,15 @@ $(document).ready(function(){
       console.log("WAIT FOR AI TO MOVE")
       setTimeout(function(){
         // aiMoveRandom(gameBoard);
-        aiMoveHard(gameBoard);
+        if (gameBoard.difficulty === "1"){
+          aiMoveRandom(gameBoard);
+        }
+        else if (gameBoard.difficulty === "2"){
+          aiMoveHard(gameBoard);
+        } else {
+          aiImpossible(gameBoard);
+          console.log("TURN COUNTER" + boardInput.turnCounter)
+        }
       }, 1000);
     }
   });
@@ -231,7 +384,7 @@ $(document).ready(function(){
 
   //START GAME
 
-$("form.menuForm").submit(function(event){
+  $("form.menuForm").submit(function(event){
     event.preventDefault();
     resetBoard();
     $(".menu").hide();
@@ -244,7 +397,16 @@ $("form.menuForm").submit(function(event){
       console.log("WAIT FOR AI TO MOVE")
       setTimeout(function(){
         // aiMoveRandom(gameBoard);
-        aiMoveHard(gameBoard);
+        if (gameBoard.difficulty === "1"){
+          aiMoveRandom(gameBoard);
+        }
+        else if (gameBoard.difficulty === "2"){
+          aiMoveHard(gameBoard);
+
+        } else {
+          aiImpossible(gameBoard);
+          console.log("TURN COUNTER:" + gameBoard.turnCounter);
+        }
       }, 1000);
     }
   });
@@ -253,14 +415,14 @@ function aiMoveRandom(boardInput){
   var ran = Math.floor((Math.random()*9)+1);
   if (!boardInput.boardArray[ran]){
     if (gameBoard.turn===0) {
-    boardInput.boardArray[ran]=-1;
-    $(".box" + ran).addClass("oPic");
-    boardInput.turnCounter++;
-  } else {
-    boardInput.boardArray[ran]=1;
-    $(".box" + ran).addClass("xPic");
-    boardInput.turnCounter++;
-  }
+      boardInput.boardArray[ran]=-1;
+      $(".box" + ran).addClass("oPic");
+      boardInput.turnCounter++;
+    } else {
+      boardInput.boardArray[ran]=1;
+      $(".box" + ran).addClass("xPic");
+      boardInput.turnCounter++;
+    }
     //CHECK GAME OVER
     var winner = checkIfWinner(gameBoard.boardArray);
     var draw = checkDraw(gameBoard.boardArray);
@@ -288,9 +450,11 @@ function aiMoveHard(boardInput){
   }
   var newSquareWeWin = makeThreeInRow(boardInput, (reverseTurn));
   var newSquareTheyWouldWin = makeThreeInRow(boardInput, (boardInput.turn));
+  var newSquareAdvantage = makeTwoInRow(boardInput, (reverseTurn));
+  var newSquareTheirAdv = makeThreeInRow(boardInput, (boardInput.turn));
   if (newSquareWeWin){
 
-      if (gameBoard.turn===0) {
+    if (gameBoard.turn===0) {
       boardInput.boardArray[newSquareWeWin]=-1;
       $(".box" + newSquareWeWin).addClass("oPic");
       boardInput.turnCounter++;
@@ -300,13 +464,33 @@ function aiMoveHard(boardInput){
       boardInput.turnCounter++;
     }
   } else if(newSquareTheyWouldWin){
-      if (gameBoard.turn===0) {
+    if (gameBoard.turn===0) {
       boardInput.boardArray[newSquareTheyWouldWin]=-1;
       $(".box" + newSquareTheyWouldWin).addClass("oPic");
       boardInput.turnCounter++;
     } else {
       boardInput.boardArray[newSquareTheyWouldWin]=1;
       $(".box" + newSquareTheyWouldWin).addClass("xPic");
+      boardInput.turnCounter++;
+    }
+  } else if (newSquareAdvantage){
+    if (gameBoard.turn===0) {
+      boardInput.boardArray[newSquareAdvantage]=-1;
+      $(".box" + newSquareAdvantage).addClass("oPic");
+      boardInput.turnCounter++;
+    } else {
+      boardInput.boardArray[newSquareAdvantage]=1;
+      $(".box" + newSquareAdvantage).addClass("xPic");
+      boardInput.turnCounter++;
+    }
+  } else if (newSquareTheirAdv){
+    if (gameBoard.turn===0) {
+      boardInput.boardArray[newSquareTheirAdv]=-1;
+      $(".box" + newSquareTheirAdv).addClass("oPic");
+      boardInput.turnCounter++;
+    } else {
+      boardInput.boardArray[newSquareTheirAdv]=1;
+      $(".box" + newSquareTheirAdv).addClass("xPic");
       boardInput.turnCounter++;
     }
   } else {
@@ -349,9 +533,27 @@ function makeThreeInRow(board, turn){
   return false;
 }
 
+
 //takes in x or o for who it is checking, returns square to make two in a row
 function makeTwoInRow(board, turn){
-
+  for(var i = 1; i <= 9; i++){
+    var boardClone = board.boardArray.slice(0);
+    if(board.boardArray[i] === 0){
+      if (turn === 0){
+        //CHECKING
+        boardClone[i] = 1;
+        if (checkIfAdvantage(boardClone)){
+          return i;
+        }
+      } else {
+        boardClone[i] = -1;
+        if (checkIfAdvantage(boardClone)){
+          return i;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 //FINAL WINNING MOVE AGAINST AI ENDED IN DRAW
