@@ -12,15 +12,14 @@ gameBoard = new Board();
 gameBoard.activation = false;
 function clicked(event){
   // console.log(gameBoard.boardArray.toString()
-
   if (gameBoard.activation === false) {
     console.log("the game is not running")
     return false;
   } else {
-    //AI IS MOVING
-    if(gameBoard.opponentType === "ai" && gameBoard.turnCounter % 2 != 0){
+    //AI IS MOVING first NOT DOING ANYTHING
+    if(gameBoard.opponentType === "ai" && (gameBoard.turnCounter + 1) === gameBoard.turn) {
       console.log("WAIT FOR AI TO MOVE")
-      //PLAYER CAN MOVE
+      //PLAYER X CAN MOVE
     } else {
       var x = event.clientX;
       var y = event.clientY;
@@ -29,7 +28,8 @@ function clicked(event){
       var square = getSquare(x,y);
       if(square){
         if (!($(".box" + square).hasClass("xPic")) && !($(".box" + square).hasClass("oPic"))){
-          if(gameBoard.turnCounter % 2 === 0){
+          // if (gameBoard.opponentType === "ai" && gameBoard.turnCounter % 2 === gameBoard.turn)
+          if (gameBoard.turnCounter % 2 === 0){
             $(".box" + square).addClass("xPic");
             gameBoard.boardArray[square] = 1;
           } else { // turnCounter is not % 2 === 0
@@ -40,7 +40,7 @@ function clicked(event){
           var winner = checkIfWinner(gameBoard.boardArray);
           if (winner){
             console.log(winner);
-            $(".win").text("PLAYER [" + ((gameBoard.turnCounter % 2) + 1) + "]WAS THE WINNER!");
+            $(".win").text("PLAYER " + (((gameBoard.turnCounter +1) % 2)+1) + " WAS THE WINNER!");
             gameBoard.activation = false
           }
           var draw = checkDraw(gameBoard.boardArray);
@@ -51,19 +51,25 @@ function clicked(event){
           }
         }
       }
-
       //AI MOVE
-      if(gameBoard.activation && gameBoard.opponentType === "ai" && gameBoard.turnCounter % 2 != 0){
+      if(gameBoard.activation && gameBoard.opponentType === "ai" && gameBoard.turnCounter % 2 != gameBoard.turn){
          setTimeout(function(){
-           aiMove(gameBoard);
+           // aiMoveRandom(gameBoard);
+           aiMoveHard(gameBoard);
          }, 1000);
       }
     };
   }
 };
 
-function Board(opponentType, difficulty){
+function Board(opponentType, difficulty, turn){
+  if (opponentType === "ai" && turn === 1){
+      this.turn = 1;
+  } else {
+    this.turn = 0;
+  }
   this.turnCounter = 0;
+  console.log(this.turnCounter)
   this.boardArray = makeBoard();
   this.activation = true;
   this.opponentType = opponentType;
@@ -117,8 +123,8 @@ function resetBoard(){
 }
 
 //TAKES IN GLOBAL VARIABLES
-function startNewGame(opponentType, difficulty){
-  gameBoard = new Board(opponentType, difficulty)
+function startNewGame(opponentType, difficulty, turn){
+  gameBoard = new Board(opponentType, difficulty, turn)
 }
 
 function checkDraw(boardInput){
@@ -166,12 +172,36 @@ function checkIfWinner(boardInput){
   }
 }
 
+// Attempt to create a hard AI
+// testBoard = new Board("ai","2","1");
+// var testBoard1 = [0,1,1,0,-1,-1,0,1,-1]
+//
+// function AiHard(boardInput, turnCounter, turn) {
+//   var sums = [0];
+//   var num = 1;
+//   for (var i = 1, i <= 3, i+=1);
+//     sum.push(boardInput[i]+boardInput[i+1]+boardInput[i+2])
+//   }
+//   for (var i = 1, i <= 7, i+=3);
+//     sum.push(boardInput[i]+boardInput[i+1]+boardInput[i+2])
+//   sum.push(boardInput[1]+boardInput[5]+boardInput[9])
+//   sum.push(boardInput[3]+boardInput[5]+boardInput[7])
+// )
+// function
+
 $(document).ready(function(){
   // alert("hi")
   $("#resetButton").click(function(event){
     event.preventDefault();
     resetBoard();
     gameBoard.activation = true;
+    if(gameBoard.opponentType === "ai" && (gameBoard.turnCounter + 1) === gameBoard.turn) {
+      console.log("WAIT FOR AI TO MOVE")
+      setTimeout(function(){
+        // aiMoveRandom(gameBoard);
+        aiMoveHard(gameBoard);
+      }, 1000);
+    }
   });
 
   //menu toggle
@@ -200,45 +230,128 @@ $(document).ready(function(){
   })
 
   //START GAME
-  $("form.menuForm").submit(function(event){
+
+$("form.menuForm").submit(function(event){
     event.preventDefault();
     resetBoard();
     $(".menu").hide();
     menuShowing = false;
     gameBoard.activation = true;
     var difficulty = $("#difficultyLevel").val();
-    startNewGame(opponentType, difficulty);
+    var turn = parseInt($("#playerTurn").val());
+    startNewGame(opponentType, difficulty, turn);
+    if(gameBoard.opponentType === "ai" && (gameBoard.turnCounter + 1) === gameBoard.turn) {
+      console.log("WAIT FOR AI TO MOVE")
+      setTimeout(function(){
+        // aiMoveRandom(gameBoard);
+        aiMoveHard(gameBoard);
+      }, 1000);
+    }
   });
 });
-
-function aiMove(boardInput){
+function aiMoveRandom(boardInput){
   var ran = Math.floor((Math.random()*9)+1);
   if (!boardInput.boardArray[ran]){
+    if (gameBoard.turn===0) {
     boardInput.boardArray[ran]=-1;
     $(".box" + ran).addClass("oPic");
     boardInput.turnCounter++;
-
+  } else {
+    boardInput.boardArray[ran]=1;
+    $(".box" + ran).addClass("xPic");
+    boardInput.turnCounter++;
+  }
     //CHECK GAME OVER
     var winner = checkIfWinner(gameBoard.boardArray);
+    var draw = checkDraw(gameBoard.boardArray);
     if (winner){
       console.log(winner);
       gameBoard.activation = false
       $(".win").text("YOU GOT BEAT BY THE AI!");
-    }
-    var draw = checkDraw(gameBoard.boardArray);
-    if (draw){
+    } else if (draw){
       console.log("it was a draw")
       gameBoard.activation = false
-
+      $(".win").text("The game was a draw!");
     }
   } else {
-    aiMove(boardInput);
+    aiMoveRandom(boardInput);
   }
-  // $(".box" + square).addClass("xPic");
-  // gameBoard.boardArray[airmove] = 1;
+}
 
-  // $(".box" + square).addClass("oPic");
-  // gameBoard.boardArray[aimove] = -1;
+function aiMoveHard(boardInput){
+  //if we have three in a makeTwoInRow/
+  var reverseTurn;
+  if(gameBoard.turn === 0){
+    reverseTurn = 1;
+  } else {
+    reverseTurn = 0;
+  }
+  var newSquareWeWin = makeThreeInRow(boardInput, (reverseTurn));
+  var newSquareTheyWouldWin = makeThreeInRow(boardInput, (boardInput.turn));
+  if (newSquareWeWin){
+
+      if (gameBoard.turn===0) {
+      boardInput.boardArray[newSquareWeWin]=-1;
+      $(".box" + newSquareWeWin).addClass("oPic");
+      boardInput.turnCounter++;
+    } else {
+      boardInput.boardArray[newSquareWeWin]=1;
+      $(".box" + newSquareWeWin).addClass("xPic");
+      boardInput.turnCounter++;
+    }
+  } else if(newSquareTheyWouldWin){
+      if (gameBoard.turn===0) {
+      boardInput.boardArray[newSquareTheyWouldWin]=-1;
+      $(".box" + newSquareTheyWouldWin).addClass("oPic");
+      boardInput.turnCounter++;
+    } else {
+      boardInput.boardArray[newSquareTheyWouldWin]=1;
+      $(".box" + newSquareTheyWouldWin).addClass("xPic");
+      boardInput.turnCounter++;
+    }
+  } else {
+    aiMoveRandom(boardInput);
+  }
+  //END OF AI TURN CHECK IF WINNER
+  var winner = checkIfWinner(gameBoard.boardArray);
+  var draw = checkDraw(gameBoard.boardArray);
+  if (winner){
+    console.log(winner);
+    gameBoard.activation = false
+    $(".win").text("YOU GOT BEAT BY THE AI!");
+  } else if (draw){
+    console.log("it was a draw")
+    gameBoard.activation = false
+    $(".win").text("The game was a draw!");
+  }
+  //if they have three then block
+}
+
+//takes in x or o for who it is checking, if there is a win condition, returns that square, else returns nothing
+function makeThreeInRow(board, turn){
+  for(var i = 1; i <= 9; i++){
+    var boardClone = board.boardArray.slice(0);
+    if(board.boardArray[i] === 0){
+      if (turn === 0){
+        //CHECKING
+        boardClone[i] = 1;
+        if (checkIfWinner(boardClone)){
+          return i;
+        }
+      } else {
+        boardClone[i] = -1;
+        if (checkIfWinner(boardClone)){
+          return i;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+//takes in x or o for who it is checking, returns square to make two in a row
+function makeTwoInRow(board, turn){
+
 }
 
 //FINAL WINNING MOVE AGAINST AI ENDED IN DRAW
@@ -248,5 +361,6 @@ function aiMove(boardInput){
 //card colors sections
 //opponent type is global
 //change global variables from aiMove
+//make ai move just return new square and do move manually
 
 //can seem like its working if its deleting stuff but maybe is reloading page because not prevent default

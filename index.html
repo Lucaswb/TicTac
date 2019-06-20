@@ -20,14 +20,19 @@
 
       </form>
       <div class="btn-group" role="group">
-        <button type="button" class="btn btn-secondary" id = "pvpButton">PVP</button>
-        <button type="button" class="btn btn-secondary" id = "aiButton">VS AI</button>
+        <button type="button" class="btn btn-secondary" id = "pvpButton">P vs P</button>
+        <button type="button" class="btn btn-secondary" id = "aiButton">P vs AI</button>
       </div>
       <form class="menuForm" action="index.html" method="post">
         <select class="form-control" id="difficultyLevel">
           <option value = "1">Easy</option>
           <option value = "2">Medium</option>
           <option value = "3">Hard</option>
+        </select>
+
+        <select class="form-control" id="playerTurn">
+          <option value = "0">Play as X</option>
+          <option value = "1">Play as O</option>
         </select>
         <button id = "startGameButton" type="submit" name="button">StartGame</button>
       </form>
