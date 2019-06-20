@@ -5,13 +5,14 @@ body {
 .ticTacToBoard{
   display: grid;
   grid-gap: 10px;
-  grid-template-columns: 300px 300px 300px;
-  grid-template-rows: 300px 300px 300px;
-  margin-left: 10px;
-  margin-top: 10px;
+  grid-template-columns: 200px 200px 200px;
+  grid-template-rows: 200px 200px 200px;
+  margin-left: 25%;
+  margin-top: 50px;
   background-color: black;
-  width: 920px;
+  width: 620px;
   opacity: .3;
+  mar
    /* grid-gap: 5px; */
 }
 
@@ -83,9 +84,9 @@ body {
    position: absolute;
    z-index: 2;
    opacity: .95;
-   margin-left: 15%;
+   margin-left: 30%;
    margin-top: 100px;
-   width: 70%;
+   width: 400px;
    height: 300px;
    /* display: none; */
 }

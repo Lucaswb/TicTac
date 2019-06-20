@@ -1,6 +1,6 @@
-var squareSize = 300 //line this up with grid dimensions
-var topOffSet = 10;
-var leftOffSet = 10;
+var squareSize = 200 //line this up with grid dimensions
+var topOffSet = 50;
+var leftOffSet =  parseFloat($(window).width())*.25; //line this up with grid dimensions
 var gridGap = 10;
 var gameBoard;
 var menuShowing = true;
@@ -11,6 +11,10 @@ var array2exception = [0,1,0,1,0,-1,0,0,0,1];
 gameBoard = new Board();
 gameBoard.activation = false;
 function clicked(event){
+  squareSize = 200 //line this up with grid dimensions
+  topOffSet = 50;
+  leftOffSet =  parseFloat($(window).width())*.25; //line this up with grid dimensions
+  gridGap = 10;
   console.log("turn coutner" + gameBoard.turnCounter)
   // console.log(gameBoard.boardArray.toString()
   if (gameBoard.activation === false) {
