@@ -157,12 +157,7 @@ function boardViewReset(){
   }
 }
 
-function resetBoard(){
-  gameBoard.boardReset();
-  gameBoard.turnCounter = 0;
-  boardViewReset();
-  $(".win").text("");
-}
+
 
 //TAKES IN GLOBAL VARIABLES
 function startNewGame(opponentType, difficulty, turn){
@@ -248,34 +243,22 @@ function checkIfAdvantage(boardInput, turn){
     return 2;
   } else {
   }
+
+Board.prototype.resetBoard = function(){
+  this.activation = true;
+  this.boardReset();
+  this.turnCounter = 0;
+  boardViewReset();
+  $(".win").text("");
 }
-// Attempt to create a hard AI
-// testBoard = new Board("ai","2","1");
-// var testBoard1 = [0,1,1,0,-1,-1,0,1,-1]
-//
-// function aiMoveHard(boardInput, turnCounter, turn) {
-//   var sums = [0];
-//   var num = 1;
-//   for (var i = 1, i <= 3, i+=1);
-//     sum.push(boardInput[i]+boardInput[i+1]+boardInput[i+2])
-//   }
-//   for (var i = 1, i <= 7, i+=3);
-//     sum.push(boardInput[i]+boardInput[i+1]+boardInput[i+2])
-//   sum.push(boardInput[1]+boardInput[5]+boardInput[9])
-//   sum.push(boardInput[3]+boardInput[5]+boardInput[7])
-// )
-// function
 
 $(document).ready(function(){
-  // alert("hi")
   $("#resetButton").click(function(event){
     event.preventDefault();
-    resetBoard();
-    gameBoard.activation = true;
+    gameBoard.resetBoard();
     if(gameBoard.opponentType === "ai" && (gameBoard.turnCounter + 1) === gameBoard.turn) {
       console.log("WAIT FOR AI TO MOVE")
       setTimeout(function(){
-        // aiMoveRandom(gameBoard);
         gameBoard.aiMove();
       }, 1000);
     }
@@ -515,18 +498,25 @@ Board.prototype.aiImpossible = function(){
         this.turnCounter++;
       }
     } else if(playerMove != 5 && this.turnCounter === 1){
-      if (this.turn===0) {
-        this.boardArray[5]=-1;
-        $(".box" + 5).addClass("oPic");
-        this.turnCounter++;
+      this.updateBoard(5);
+      if(turn === 0){
+        $(".box" + nextMove).addClass("oPic");
       } else {
-        this.boardArray[5]=1;
-        $(".box" + 5).addClass("xPic");
-        this.turnCounter++;
+        $(".box" + nextMove).addClass("xPic");
       }
     } else {
       this.aiMoveHard();
     }
+  }
+}
+
+Board.prototype.updateBoard = function(nextMove){
+  if (this.turn===0) {
+    this.boardArray[nextMove]=-1;
+    this.turnCounter++;
+  } else {
+    this.boardArray[nextMove]=1;
+    this.turnCounter++;
   }
 }
 
@@ -586,3 +576,5 @@ function makeTwoInRow(board, turn){
 
 //AI not seeing TRAP IF WE GO MIDDLE have AI automatically go to corner
 //FIX NOT DEACTIVING CLICK WHEN AI IS GOING
+
+//FACTOR OUT VIEW LOGIC FROM BOARD AI AND HAVE IT RETURN THE BOARD ARRAY SO THE VIEW CAN UPDATE
