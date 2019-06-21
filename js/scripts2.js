@@ -1,5 +1,5 @@
 var squareSize = 200; //line this up with grid dimensions
-var topOffSet = 50;
+var topOffSet = 156;
 var leftOffSet =  100; //line this up with grid dimensions
 var gridGap = 10;
 var gameBoard;
@@ -7,6 +7,8 @@ var menuShowing = true;
 //ONLOAD
 var array1exception = [0,0,0,1,0,-1,0,1,0,0];
 var array2exception = [0,1,0,1,0,-1,0,0,0,1];
+var array3exception = [0,0,-1,1,0,1,0,-1,0,0];
+
 gameBoard = new Board();
 gameBoard.activation = false;
 function clicked(event){
@@ -243,6 +245,7 @@ function checkIfAdvantage(boardInput, turn){
     return 2;
   } else {
   }
+}
 
 Board.prototype.resetBoard = function(){
   this.activation = true;
@@ -293,7 +296,7 @@ $(document).ready(function(){
 
   $("form.menuForm").submit(function(event){
     event.preventDefault();
-    resetBoard();
+    gameBoard.resetBoard();
     $(".menu").hide();
     menuShowing = false;
     gameBoard.activation = true;
@@ -303,7 +306,7 @@ $(document).ready(function(){
 
     if(gameBoard.opponentType === "ai" && (gameBoard.turnCounter + 1) === gameBoard.turn) {
       setTimeout(function(){
-      gameBoard.aiMove();
+        gameBoard.aiMove();
       }, 1000);
     }
   });
@@ -430,6 +433,11 @@ Board.prototype.aiImpossible = function(){
         $(".box" + 3).addClass("xPic");
         this.turnCounter++;
       }
+    } else if (this.boardArray.toString()=== array3exception.toString() && this.turn === 1){
+      this.boardArray[9]=1;
+      $(".box" + 9).addClass("xPic");
+      this.turnCounter++;
+
     } else if (this.turnCounter === 2){
       var playerMove = findPlayerFirstMove(this);
       var aiMove;
@@ -498,11 +506,14 @@ Board.prototype.aiImpossible = function(){
         this.turnCounter++;
       }
     } else if(playerMove != 5 && this.turnCounter === 1){
-      this.updateBoard(5);
-      if(turn === 0){
-        $(".box" + nextMove).addClass("oPic");
+      if(this.turn === 0){
+        this.boardArray[5]=-1;
+        $(".box" + 5).addClass("oPic");
+        this.turnCounter++;
       } else {
-        $(".box" + nextMove).addClass("xPic");
+        this.boardArray[5]=1;
+        $(".box" + 5).addClass("xPic");
+        this.turnCounter++;
       }
     } else {
       this.aiMoveHard();

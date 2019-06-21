@@ -1,5 +1,21 @@
 body {
-  background-image: linear-gradient(45deg, red, blue);
+  background-image: linear-gradient(90deg, #333, #888);
+  height: 1000px;
+  font-family: serif;
+}
+.headOfProject{
+  margin-top: 30px;
+  text-align: left;
+  margin-left: 100px;
+  color: white;
+}
+h2 {
+  font-size: 60px;
+}
+
+.win{
+  margin-left: 100px;
+  margin-top:10px;
 }
 
 .ticTacToBoard{
@@ -8,16 +24,18 @@ body {
   grid-template-columns: 200px 200px 200px;
   grid-template-rows: 200px 200px 200px;
   margin-left: 100px;
-  margin-top: 50px;
-  background-color: black;
+  margin-top: 20px;
+  border-width: 20px;
   width: 620px;
-  opacity: .3;
+  opacity: .5;
   mar
    /* grid-gap: 5px; */
 }
 
 .box{
   background-color: white;
+  border-radius: 10px;
+  box-shadow: 8px 8px 15px #222;
 }
 
 .box1 {
@@ -83,8 +101,8 @@ body {
 .menu{
    position: absolute;
    z-index: 2;
-   opacity: .95;
-   margin-left: 30%;
+   opacity: .9;
+   margin-left: 40%;
    margin-top: 100px;
    width: 400px;
    height: 300px;
@@ -101,6 +119,23 @@ select.form-control{
   font-style: italic;
 }
 
+form.reset{
+  background-color: white;
+  opacity: .5;
+  /* border-style: solid;
+  border-width: 5px; */
+  border-radius: 10px;
+  margin-left: 100px;
+  margin-top: 20px;
+  width: 200px;
+  box-shadow: 8px 8px 15px #222;
+}
+
+form.reset button{
+  margin-top: 20px;
+  margin-left: 10px;
+  margin-bottom: 20px;
+}
 
 /*TO DO LIST */
 /* js: %, separate $ in grid template */
